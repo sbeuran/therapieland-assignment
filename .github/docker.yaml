@@ -1,0 +1,50 @@
+name: Docker Image CI
+
+on:
+  push:
+    branches: [ "main" ]
+
+jobs:
+
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Build the Docker image
+      run: cd custom-http-server; docker build . --tag sbeuran/therapieland-assignment:latest; cd ..;
+    
+    - name: Login to dockerhub registry
+      run: echo "${{ secrets.DOCKERHUB_PASSWORD }}" | docker login --username "${{ secrets.DOCKERHUB_USERNAME }}" --password-stdin
+    
+    - name: Push the Docker image
+      run: docker push sbeuran/therapieland-assignment:latest
+
+  deploy:
+    needs: build
+
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Setup kubectl
+      run: |
+        curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"
+        chmod 700 ./kubectl
+
+    - name: Save kubeconfig and set it as default
+      run: |
+
+    - name: Deploy to K8S
+      env:
+        KUBECONFIG_DATA: ${{ secrets.KUBECONFIG_DATA }}
+      run: |
+        echo "$KUBECONFIG_DATA" > ./kubeconfig
+        export KUBECONFIG=./kubeconfig
+        
+        ./kubectl delete namespace therapieland --ignore-not-found=true
+        ./kubectl create namespace therapieland
+        ./kubectl apply -f k8s/deployment.yaml
+        ./kubectl apply -f k8s/service.yaml

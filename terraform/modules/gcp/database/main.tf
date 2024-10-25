@@ -4,10 +4,8 @@ resource "google_sql_database_instance" "therapieland-db" {
   region           = var.region
   project          = var.project
 
-  root_password = var.db-instance-root-password
-
   depends_on = [ var.therapieland-db-google-service-networking-connection-id ]
-
+  
   deletion_protection = false
   
   settings {
@@ -16,7 +14,17 @@ resource "google_sql_database_instance" "therapieland-db" {
     ip_configuration {
       ipv4_enabled = false
       private_network = var.db-instance-network-self-link
-      require_ssl = true
     }
   }
+}
+
+resource "google_sql_database" "database" {
+  name     = var.db-name
+  instance = google_sql_database_instance.therapieland-db.name
+}
+
+resource "google_sql_user" "users" {
+  name     = var.db-instance-user
+  instance = google_sql_database_instance.therapieland-db.name
+  password = var.db-instance-password
 }

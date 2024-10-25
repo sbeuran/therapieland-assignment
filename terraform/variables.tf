@@ -22,7 +22,15 @@ variable "gcp-database-version" {
   type = string
 }
 
-variable "gcp-database-instance-root-password" {
+variable "gcp-database-instance-user" {
+  type = string
+}
+
+variable "gcp-database-instance-password" {
+  type = string
+}
+
+variable "gcp-database-name" {
   type = string
 }
 

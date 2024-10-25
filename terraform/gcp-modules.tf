@@ -26,7 +26,10 @@ module "database" {
   
   db-instance-database-version = var.gcp-database-version
   db-instance-tier = var.gcp-database-instance-tier
-  db-instance-root-password = var.gcp-database-instance-root-password
+  
+  db-name = var.gcp-database-name
+  db-instance-user = var.gcp-database-instance-user
+  db-instance-password = var.gcp-database-instance-password
 }
 
 module "gke" {

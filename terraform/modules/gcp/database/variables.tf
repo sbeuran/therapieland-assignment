@@ -10,7 +10,15 @@ variable "db-instance-tier" {
   type = string
 }
 
-variable "db-instance-root-password" {
+variable "db-instance-user" {
+  type = string
+}
+
+variable "db-instance-password" {
+  type = string
+}
+
+variable "db-name" {
   type = string
 }
 

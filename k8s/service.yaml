@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: therapieland-service
+  namespace: therapieland
+  labels:
+    app: therapieland-app
+spec:
+  type: LoadBalancer
+  selector:
+    app: therapieland-app
+  ports:
+    - protocol: TCP
+      port: 8080
+      targetPort: 8080
