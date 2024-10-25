@@ -29,6 +29,13 @@ jobs:
     steps:
     - uses: actions/checkout@v4
     
+    - name: Install Gcloud plugins
+      run: |
+        curl https://packages.cloud.google.com/apt/doc/apt-key.gpg | sudo gpg --dearmor -o /usr/share/keyrings/cloud.google.gpg
+        echo "deb [signed-by=/usr/share/keyrings/cloud.google.gpg] https://packages.cloud.google.com/apt cloud-sdk main" | sudo tee -a /etc/apt/sources.list.d/google-cloud-sdk.list
+        sudo apt-get update
+        sudo apt-get install google-cloud-sdk-gke-gcloud-auth-plugin
+
     - name: Setup kubectl
       run: |
         curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"
@@ -39,8 +46,12 @@ jobs:
 
     - name: Deploy to K8S
       env:
+        GCLOUD_SA_KEY_JSON: ${{ secrets.GCLOUD_SA_KEY_JSON }}
         KUBECONFIG_DATA: ${{ secrets.KUBECONFIG_DATA }}
       run: |
+        echo "$GCLOUD_SA_KEY_JSON" > ./gcloud.key.json
+        gcloud auth activate-service-account --key-file=gcloud.key.json
+
         echo "$KUBECONFIG_DATA" > ./kubeconfig
         export KUBECONFIG=./kubeconfig
         
