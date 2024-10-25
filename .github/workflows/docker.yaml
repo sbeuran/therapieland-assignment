@@ -1,6 +1,7 @@
 name: Docker Image CI
 
 on:
+  workflow_dispatch:
   push:
     branches: [ "main" ]
 
@@ -48,6 +49,10 @@ jobs:
       env:
         GCLOUD_SA_KEY_JSON: ${{ secrets.GCLOUD_SA_KEY_JSON }}
         KUBECONFIG_DATA: ${{ secrets.KUBECONFIG_DATA }}
+        DB_HOST: ${{ secrets.DB_HOST }}
+        DB_NAME: ${{ secrets.DB_NAME }}
+        DB_PASS: ${{ secrets.DB_PASS }}
+        DB_USER: ${{ secrets.DB_USER }}
       run: |
         echo "$GCLOUD_SA_KEY_JSON" > ./gcloud.key.json
         gcloud auth activate-service-account --key-file=gcloud.key.json
@@ -57,5 +62,13 @@ jobs:
         
         ./kubectl delete namespace therapieland --ignore-not-found=true
         ./kubectl create namespace therapieland
+
+        ./kubectl create secret generic therapieland-secret -n therapieland \
+          --from-literal=DB_HOST=$DB_HOST \
+          --from-literal=DB_NAME=$DB_NAME \
+          --from-literal=DB_PASS=$DB_PASS \
+          --from-literal=DB_USER=$DB_USER 
+
         ./kubectl apply -f k8s/deployment.yaml
         ./kubectl apply -f k8s/service.yaml
+        ./kubectl apply -f k8s/hpa.yaml

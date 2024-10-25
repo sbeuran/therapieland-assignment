@@ -6,3 +6,4 @@ terraform/tf.statefile.json
 terraform/tf.statefile.json.backup
 terraform/.tf.statefile.json.lock.info
 terraform/.terraform.lock.hcl
+terraform/therapieland.kubeconfig

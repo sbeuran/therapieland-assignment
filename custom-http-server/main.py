@@ -29,6 +29,10 @@ class SimpleHTTPRequestHandler(BaseHTTPRequestHandler):
         self.end_headers()
         self.wfile.write(full_text_bytes)
 
+        # some code to test K8S HPA
+        for i in range(1, 500):
+            pass
+
 
 if __name__ == "__main__":
 

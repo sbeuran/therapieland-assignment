@@ -2,7 +2,7 @@
 The project aims at provisioning infrastructure and deployment of an application into GCP. 
 
 The proposed architecture diagram is below:
-![GCP-terraform-GKE-infra-basic.png](GCP-terraform-GKE-infra-basic.png)
+![GCP-terraform-GKE-infra-basic.png](media/GCP-terraform-GKE-infra-basic.png)
 ## GCP initial configuration
 1. Create new project, say `Therapieland`
 2. Create service account for `terraform`, give it an `Editor` and a `Compute Network Admin` roles.
@@ -58,3 +58,49 @@ secret called `DB_NAME`
 You saved file called `therapieland-github-key.json` earlier during `GCP initial setup`. Save it's content in a secret called `GCLOUD_SA_KEY_JSON`.
 
 6. `Docker hub` credentials. Save your docker hub `username` and `password` in secrets called `DOCKERHUB_USERNAME` and `DOCKERHUB_PASSWORD` respectively.
+
+## Running the app:
+New deployment is triggered on push into `main` branch of the project.
+Also, it's possible to run it manually by hitting the button in `Github`. Open https://github.com/sbeuran/therapieland-assignment/actions/workflows/docker.yaml, like on the image below:
+![](media/run-workflow.png)
+
+## Getting credentials to the kubernetes and accessing the service
+1. Get the `GKE` kubeconfig
+```bash
+terraform output -raw kubeconfig > therapieland.kubeconfig
+```
+2. Set the kubeconfig location:
+```bash
+export KUBECONFIG=$(pwd)/therapieland.kubeconfig
+```
+3. Login with `gcloud`
+```bash
+gcloud auth login
+```
+4. Update the current project id, used by `gcloud`, so if for instance your project id is `therapieland-512451`:
+```bash
+gcloud config set project therapieland-512451
+```
+6. Install `gke-gcloud-auth-plugin` as described here
+https://cloud.google.com/blog/products/containers-kubernetes/kubectl-auth-changes-in-gke.
+For MAC users - just run 
+```bash
+gcloud components install gke-gcloud-auth-plugin
+```
+7. Check pods in `therapieland` namespace
+```bash
+kubectl get pods -n therapieland
+```
+8. Get public IP of the service (`EXTERNAL-IP`)
+```bash
+kubectl get svc -n therapieland therapieland-service
+```
+Navigate to the provided IP in browser (port is `8080`)
+
+### Testing Horizontal Pod Autoscaler
+1. Run the following to get info about hpa:
+```bash
+watch kubectl get hpa -n therapieland
+```
+2. You can simulate a huge load by accessing the endpoint with Postman
+3. See how the number of replicas goes up
