@@ -8,7 +8,6 @@ module "networking" {
   project = var.gcp-project-name
 
   therapieland-vpc-gke-subnet-01-cidr = var.therapieland-vpc-gke-subnet-01-cidr
-  therapieland-vpc-db-subnet-01-cidr = var.therapieland-vpc-db-subnet-01-cidr
 }
 
 module "database" {

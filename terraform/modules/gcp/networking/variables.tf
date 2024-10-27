@@ -10,7 +10,3 @@ variable "region" {
 variable "therapieland-vpc-gke-subnet-01-cidr" {
   type = string
 }
-
-variable "therapieland-vpc-db-subnet-01-cidr" {
-  type = string
-}
